@@ -33,7 +33,7 @@ if [ -z "${PETSC_DIR}" ]; then
     echo "END MESSAGE"
     
     FILES="include/petsc.h"
-    DIRS="/ /usr /usr/local /usr/local/petsc /usr/local/packages/petsc /usr/local/apps/petsc"
+    DIRS="/ /usr /usr/local /usr/lib/petsc /usr/local/petsc /usr/local/packages/petsc /usr/local/apps/petsc"
     for dir in $DIRS; do
         PETSC_DIR="$dir"
         for file in $FILES; do
@@ -227,6 +227,9 @@ if [ -z "${PETSC_DIR}" -o "${PETSC_DIR}" = 'BUILD' ]; then
         ${MAKE} PETSC_DIR="${BUILD_DIR}/${NAME}" PETSC_ARCH="${PETSC_ARCH}" install
         popd
         
+        echo "PETSc: Cleaning up..."
+        rm -rf ${BUILD_DIR}
+        
         date > ${DONE_FILE}
         echo "PETSc: Done."
     fi
@@ -290,7 +293,7 @@ else
     
     # Set version-specific libraries
     # (version 2.2.0 and newer do not have libpetscsles.a any more)
-    if [ -e "${PETSC_DIR}/lib${PETSC_LIB_INFIX}/${PETSC_ARCH}/libpetscksp.a" -o -e "${PETSC_DIR}/lib/libpetscksp.a" -o -e "${PETSC_DIR}/${PETSC_ARCH}/lib/libpetscksp.a" ]; then
+    if [ -e "${PETSC_DIR}/lib${PETSC_LIB_INFIX}/${PETSC_ARCH}/libpetscksp.a" -o -e "${PETSC_DIR}/lib/libpetscksp.a" -o -e "${PETSC_DIR}/${PETSC_ARCH}/lib/libpetscksp.a"]; then
         PETSC_SLES_LIBS="petscksp"
     else
         PETSC_SLES_LIBS="petscsles"
@@ -299,7 +302,12 @@ else
     # Set the PETSc libs, libdirs and includedirs
     PETSC_INC_DIRS="${PETSC_DIR}/include ${PETSC_DIR}/bmake/${PETSC_ARCH} ${PETSC_DIR}/${PETSC_ARCH}/include"
     PETSC_LIB_DIRS="${PETSC_DIR}/lib${PETSC_LIB_INFIX}/${PETSC_ARCH} ${PETSC_DIR}/lib ${PETSC_DIR}/${PETSC_ARCH}/lib"
-    PETSC_LIBS="petscts petscsnes ${PETSC_SLES_LIBS} petscdm petscmat petscvec petsc ${PETSC_ARCH_LIBS}"
+    # (version 3 and newer place everything into a single library)
+    if [ -e "${PETSC_DIR}/lib${PETSC_LIB_INFIX}/${PETSC_ARCH}/libpetscvec.a" -o -e "${PETSC_DIR}/lib/libpetscvec.a" -o -e "${PETSC_DIR}/${PETSC_ARCH}/lib/libpetscvec.a"]; then
+        PETSC_LIBS="petscts petscsnes ${PETSC_SLES_LIBS} petscdm petscmat petscvec petsc ${PETSC_ARCH_LIBS}"
+    else
+        PETSC_LIBS="petsc ${PETSC_ARCH_LIBS}"
+    fi
     
 fi
 
