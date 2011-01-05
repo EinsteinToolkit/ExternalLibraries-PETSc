@@ -168,8 +168,12 @@ if [ -z "${PETSC_DIR}" -o "${PETSC_DIR}" = 'BUILD' ]; then
                                 echo ${file}
                                 break 2
                             fi
+                            unset file
                         done
                     done
+                    if [ -z "${file}" ]; then
+                        echo "PETSc:    Could not find MPI library ${lib}" >&2
+                    fi
                 done))
         BLAS_LIB_LIST=$(echo $(
                 for lib in ${BLAS_LIBS} ${PETSC_BLAS_EXTRA_LIBS}; do
@@ -180,8 +184,12 @@ if [ -z "${PETSC_DIR}" -o "${PETSC_DIR}" = 'BUILD' ]; then
                                 echo ${file}
                                 break 2
                             fi
+                            unset file
                         done
                     done
+                    if [ -z "${file}" ]; then
+                        echo "PETSc:    Could not find BLAS library ${lib}" >&2
+                    fi
                 done))
         LAPACK_LIB_LIST=$(echo $(
                 for lib in ${LAPACK_LIBS} ${PETSC_LAPACK_EXTRA_LIBS}; do
@@ -192,8 +200,12 @@ if [ -z "${PETSC_DIR}" -o "${PETSC_DIR}" = 'BUILD' ]; then
                                 echo ${file}
                                 break 2
                             fi
+                            unset file
                         done
                     done
+                    if [ -z "${file}" ]; then
+                        echo "PETSc:    Could not find LAPACK library ${lib}" >&2
+                    fi
                 done))
 #            --LDFLAGS="${LDFLAGS}"
         ./config/configure.py                                                 \
@@ -253,9 +265,9 @@ fi
 if [ -n "${THORN}" ]; then
     
     # We built PETSc ourselves, and know what is going on
-    PETSC_INC_DIRS="${PETSC_DIR}/include"
-    PETSC_LIB_DIRS="${PETSC_DIR}/lib"
-    PETSC_LIBS="petsc ${MPI_LIBS}"
+    PETSC_INC_DIRS="${PETSC_DIR}/include ${PETSC_MPI_INC_DIR}"
+    PETSC_LIB_DIRS="${PETSC_DIR}/lib ${PETSC_MPI_LIB_DIRS}"
+    PETSC_LIBS="petsc ${PETSC_MPI_LIBS}"
     
 else
     
