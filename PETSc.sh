@@ -72,7 +72,7 @@ if [ -z "${PETSC_DIR}" -o "${PETSC_DIR}" = 'BUILD' ]; then
     
     # Set locations
     THORN=PETSc
-    NAME=petsc-3.1-p5
+    NAME=petsc-3.1-p7
     SRCDIR=$(dirname $0)
     BUILD_DIR=${SCRATCH_BUILD}/build/${THORN}
     INSTALL_DIR=${SCRATCH_BUILD}/external/${THORN}
