@@ -65,14 +65,17 @@ fi
 # Build
 ################################################################################
 
-if [ -z "${PETSC_DIR}" -o "${PETSC_DIR}" = 'BUILD' ]; then
+if [ -z "${PETSC_DIR}"                                                  \
+     -o "$(echo "${PETSC_DIR}" | tr '[a-z]' '[A-Z]')" = 'BUILD' ]
+then
     echo "BEGIN MESSAGE"
     echo "Building PETSc..."
     echo "END MESSAGE"
     
     # Set locations
     THORN=PETSc
-    NAME=petsc-3.1-p7
+    NAME=petsc-3.1-p8
+    #NAME=petsc-3.2-p3
     SRCDIR=$(dirname $0)
     BUILD_DIR=${SCRATCH_BUILD}/build/${THORN}
     INSTALL_DIR=${SCRATCH_BUILD}/external/${THORN}
@@ -91,11 +94,6 @@ if [ -z "${PETSC_DIR}" -o "${PETSC_DIR}" = 'BUILD' ]; then
         echo "PETSc: The enclosed PETSc library has already been built; doing nothing"
     else
         echo "PETSc: Building enclosed PETSc library"
-        
-        # Should we use gmake or make?
-        MAKE=$(gmake --help > /dev/null 2>&1 && echo gmake || echo make)
-        # Should we use gtar or tar?
-        TAR=$(gtar --help > /dev/null 2> /dev/null && echo gtar || echo tar)
         
         # Set up environment
         # This is where we will install PETSc, not where be are
@@ -208,6 +206,7 @@ if [ -z "${PETSC_DIR}" -o "${PETSC_DIR}" = 'BUILD' ]; then
                     fi
                 done))
 #            --LDFLAGS="${LDFLAGS}"
+#            --with-shared=0
         ./config/configure.py                                                 \
             --doCleanup=0                                                     \
             --prefix=${INSTALL_DIR}                                           \
@@ -223,6 +222,7 @@ if [ -z "${PETSC_DIR}" -o "${PETSC_DIR}" = 'BUILD' ]; then
             ${MPI_LIB_LIST:+--with-mpi-lib=[$(echo ${MPI_LIB_LIST} |          \
                     sed -e 's/ /,/g')]}                                       \
             --with-mpi-compilers=no                                           \
+            --with-mpiexec=false                                              \
             --with-x=no                                                       \
             ${BLAS_LIB_LIST:+--with-blas-lib=[$(echo ${BLAS_LIB_LIST} |       \
                     sed -e 's/ /,/g')]}                                       \
