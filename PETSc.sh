@@ -5,7 +5,9 @@
 ################################################################################
 
 # Set up shell
-set -x                          # Output commands
+if [ "$(echo ${VERBOSE} | tr '[:upper:]' '[:lower:]')" = 'yes' ]; then
+    set -x                      # Output commands
+fi
 set -e                          # Abort on errors
 
 
@@ -18,7 +20,7 @@ if [ -z "${MPI}" -o "${MPI}" = 'none' ]; then
     echo "BEGIN ERROR"
     echo "Thorn PETSc requires MPI"
     echo "END ERROR"
-  exit 2
+    exit 2
 fi
 
 
@@ -60,7 +62,6 @@ fi
 
 
 
-
 ################################################################################
 # Build
 ################################################################################
@@ -69,7 +70,7 @@ if [ -z "${PETSC_DIR}"                                                  \
      -o "$(echo "${PETSC_DIR}" | tr '[a-z]' '[A-Z]')" = 'BUILD' ]
 then
     echo "BEGIN MESSAGE"
-    echo "Building PETSc..."
+    echo "Using bundled PETSc..."
     echo "END MESSAGE"
     
     # Set locations
@@ -78,22 +79,36 @@ then
     #NAME=petsc-3.2-p3
     SRCDIR=$(dirname $0)
     BUILD_DIR=${SCRATCH_BUILD}/build/${THORN}
-    INSTALL_DIR=${SCRATCH_BUILD}/external/${THORN}
+    if [ -z "${PETSC_INSTALL_DIR}" ]; then
+        INSTALL_DIR=${SCRATCH_BUILD}/external/${THORN}
+    else
+        echo "BEGIN MESSAGE"
+        echo "Installing PETSC into ${PETSC_INSTALL_DIR}"
+        echo "END MESSAGE"
+        INSTALL_DIR=${PETSC_INSTALL_DIR}
+    fi
     DONE_FILE=${SCRATCH_BUILD}/done/${THORN}
     PETSC_DIR=${INSTALL_DIR}
     
-(
-    exec >&2                    # Redirect stdout to stderr
-    set -x                      # Output commands
-    set -e                      # Abort on errors
-    
-    cd ${SCRATCH_BUILD}
     if [ -e ${DONE_FILE} -a ${DONE_FILE} -nt ${SRCDIR}/dist/${NAME}.tar.gz \
                          -a ${DONE_FILE} -nt ${SRCDIR}/PETSc.sh ]
     then
-        echo "PETSc: The enclosed PETSc library has already been built; doing nothing"
+        echo "BEGIN MESSAGE"
+        echo "PETSc has already been built; doing nothing"
+        echo "END MESSAGE"
     else
-        echo "PETSc: Building enclosed PETSc library"
+        echo "BEGIN MESSAGE"
+        echo "Building PETSc"
+        echo "END MESSAGE"
+        
+        # Build in a subshell
+        (
+        exec >&2                # Redirect stdout to stderr
+        if [ "$(echo ${VERBOSE} | tr '[:upper:]' '[:lower:]')" = 'yes' ]; then
+            set -x              # Output commands
+        fi
+        set -e                  # Abort on errors
+        cd ${SCRATCH_BUILD}
         
         # Set up environment
         # This is where we will install PETSc, not where be are
@@ -244,14 +259,15 @@ then
         
         date > ${DONE_FILE}
         echo "PETSc: Done."
-    fi
-)
-    
-    if (( $? )); then
-        echo 'BEGIN ERROR'
-        echo 'Error while building PETSc. Aborting.'
-        echo 'END ERROR'
-        exit 1
+        
+        )
+        
+        if (( $? )); then
+            echo 'BEGIN ERROR'
+            echo 'Error while building PETSc. Aborting.'
+            echo 'END ERROR'
+            exit 1
+        fi
     fi
     
 fi
