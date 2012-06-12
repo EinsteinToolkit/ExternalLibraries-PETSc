@@ -76,7 +76,6 @@ then
     # Set locations
     THORN=PETSc
     NAME=petsc-3.1-p8
-    #NAME=petsc-3.2-p3
     SRCDIR=$(dirname $0)
     BUILD_DIR=${SCRATCH_BUILD}/build/${THORN}
     if [ -z "${PETSC_INSTALL_DIR}" ]; then
@@ -91,7 +90,7 @@ then
     PETSC_DIR=${INSTALL_DIR}
     
     if [ -e ${DONE_FILE} -a ${DONE_FILE} -nt ${SRCDIR}/dist/${NAME}.tar.gz \
-                         -a ${DONE_FILE} -nt ${SRCDIR}/PETSc.sh ]
+                         -a ${DONE_FILE} -nt ${SRCDIR}/configure.sh ]
     then
         echo "BEGIN MESSAGE"
         echo "PETSc has already been built; doing nothing"
