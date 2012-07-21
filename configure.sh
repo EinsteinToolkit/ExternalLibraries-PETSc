@@ -13,19 +13,6 @@ set -e                          # Abort on errors
 
 
 ################################################################################
-# Ensure that MPI is there
-################################################################################
-
-if [ -z "${MPI}" -o "${MPI}" = 'none' ]; then
-    echo "BEGIN ERROR"
-    echo "Thorn PETSc requires MPI"
-    echo "END ERROR"
-    exit 2
-fi
-
-
-
-################################################################################
 # Search
 ################################################################################
 
@@ -126,9 +113,9 @@ then
         #fi
         unset FC
         unset FFLAGS
-        MPI_INC_DIR="${PETSC_MPI_INC_DIR}"
-        MPI_LIB_DIRS="${PETSC_MPI_LIB_DIRS}"
-        MPI_LIBS="${PETSC_MPI_LIBS}"
+        # PETSc's configuration variable has a different name, and
+        # accepts only a single (sic!) directory
+        MPI_INC_DIR=$(echo $(for dir in ${MPI_INC_DIRS}; do echo ${dir}; done | head -n 1))
         if [ "${USE_RANLIB}" != 'yes' ]; then
             unset RANLIB
         fi
@@ -172,8 +159,8 @@ then
         echo "PETSc: Configuring..."
         cd ${NAME}
         MPI_LIB_LIST=$(echo $(
-                for lib in ${MPI_LIBS}; do
-                    for lib_dir in ${MPI_LIB_DIRS}; do
+                for lib in ${MPI_LIBS} ${PETSC_MPI_EXTRA_LIBS}; do
+                    for lib_dir in ${MPI_LIB_DIRS} ${PETSC_MPI_EXTRA_LIB_DIRS}; do
                         for suffix in a so dylib; do
                             file=${lib_dir}/lib${lib}.${suffix}
                             if [ -r ${file} ]; then
@@ -343,6 +330,19 @@ fi
 ################################################################################
 # Configure Cactus
 ################################################################################
+
+# Re-export MPI settings (to all PETSc users)
+echo 'BEGIN INCLUDE'
+echo '"cctki_MPI.h"'
+echo 'END INCLUDE'
+
+echo 'BEGIN MAKE_DEFINITION'
+echo 'include $(BINDINGS_DIR)/Configuration/Capabilities/make.MPI.defn'
+echo 'END MAKE_DEFINITION'
+
+echo 'BEGIN MAKE_DEPENDENCY'
+echo 'include $(BINDINGS_DIR)/Configuration/Capabilities/make.MPI.deps'
+echo 'END MAKE_DEPENDENCY'
 
 # Pass options to Cactus
 echo "BEGIN MAKE_DEFINITION"
