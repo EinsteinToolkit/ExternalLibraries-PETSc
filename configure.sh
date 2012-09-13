@@ -228,7 +228,8 @@ then
             ${BLAS_LIB_LIST:+--with-blas-lib=[$(echo ${BLAS_LIB_LIST} |       \
                     sed -e 's/ /,/g')]}                                       \
             ${LAPACK_LIB_LIST:+--with-lapack-lib=[$(echo ${LAPACK_LIB_LIST} | \
-                    sed -e 's/ /,/g')]}
+            sed -e 's/ /,/g')]}                                               \
+            --with-make="${MAKE}"
         PETSC_ARCH=$(grep '^PETSC_ARCH=' conf/petscvariables | sed -e 's/^PETSC_ARCH=//')
         echo "PETSc: PETSC_ARCH is \"${PETSC_ARCH}\""
         echo "${PETSC_ARCH}" > PETSC_ARCH
@@ -307,7 +308,7 @@ else
     
     # Set version-specific libraries
     # (version 2.2.0 and newer do not have libpetscsles.a any more)
-    if [ -e "${PETSC_DIR}/lib${PETSC_LIB_INFIX}/${PETSC_ARCH}/libpetscksp.a" -o -e "${PETSC_DIR}/lib/libpetscksp.a" -o -e "${PETSC_DIR}/${PETSC_ARCH}/lib/libpetscksp.a"]; then
+    if [ -e "${PETSC_DIR}/lib${PETSC_LIB_INFIX}/${PETSC_ARCH}/libpetscksp.a" -o -e "${PETSC_DIR}/lib/libpetscksp.a" -o -e "${PETSC_DIR}/${PETSC_ARCH}/lib/libpetscksp.a" ]; then
         PETSC_SLES_LIBS="petscksp"
     else
         PETSC_SLES_LIBS="petscsles"
@@ -317,7 +318,7 @@ else
     PETSC_INC_DIRS="${PETSC_DIR}/include ${PETSC_DIR}/bmake/${PETSC_ARCH} ${PETSC_DIR}/${PETSC_ARCH}/include"
     PETSC_LIB_DIRS="${PETSC_DIR}/lib${PETSC_LIB_INFIX}/${PETSC_ARCH} ${PETSC_DIR}/lib ${PETSC_DIR}/${PETSC_ARCH}/lib"
     # (version 3 and newer place everything into a single library)
-    if [ -e "${PETSC_DIR}/lib${PETSC_LIB_INFIX}/${PETSC_ARCH}/libpetscvec.a" -o -e "${PETSC_DIR}/lib/libpetscvec.a" -o -e "${PETSC_DIR}/${PETSC_ARCH}/lib/libpetscvec.a"]; then
+    if [ -e "${PETSC_DIR}/lib${PETSC_LIB_INFIX}/${PETSC_ARCH}/libpetscvec.a" -o -e "${PETSC_DIR}/lib/libpetscvec.a" -o -e "${PETSC_DIR}/${PETSC_ARCH}/lib/libpetscvec.a" ]; then
         PETSC_LIBS="petscts petscsnes ${PETSC_SLES_LIBS} petscdm petscmat petscvec petsc ${PETSC_ARCH_LIBS}"
     else
         PETSC_LIBS="petsc ${PETSC_ARCH_LIBS}"
