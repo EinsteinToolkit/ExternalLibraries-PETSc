@@ -246,7 +246,6 @@ then
         
         date > ${DONE_FILE}
         echo "PETSc: Done."
-        
         )
         
         if (( $? )); then
