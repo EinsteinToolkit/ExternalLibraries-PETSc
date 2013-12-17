@@ -158,57 +158,62 @@ then
         
         echo "PETSc: Configuring..."
         cd ${NAME}
-        MPI_LIB_LIST=$(echo $(
-                for lib in ${MPI_LIBS} ${PETSC_MPI_EXTRA_LIBS}; do
-                    for lib_dir in ${MPI_LIB_DIRS} ${PETSC_MPI_EXTRA_LIB_DIRS}; do
-                        for suffix in a so dylib; do
-                            file=${lib_dir}/lib${lib}.${suffix}
-                            if [ -r ${file} ]; then
-                                echo ${file}
-                                break 2
-                            fi
-                            unset file
-                        done
-                    done
-                    if [ -z "${file}" ]; then
-                        echo "PETSc:    Could not find MPI library ${lib}" >&2
+        MPI_LIB_LIST=""
+        PETSC_EXTRA_LIBS=""
+        for lib in ${MPI_LIBS} ${PETSC_MPI_EXTRA_LIBS}; do
+            for lib_dir in ${MPI_LIB_DIRS} ${PETSC_MPI_EXTRA_LIB_DIRS}; do
+                for suffix in a so dylib; do
+                    file=${lib_dir}/lib${lib}.${suffix}
+                    if [ -r ${file} ]; then
+                        MPI_LIB_LIST="${MPI_LIB_LIST} ${file}"
+                        break 2
                     fi
-                done))
-        BLAS_LIB_LIST=$(echo $(
-                for lib in ${BLAS_LIBS} ${PETSC_BLAS_EXTRA_LIBS}; do
-                    for lib_dir in ${BLAS_LIB_DIRS} ${PETSC_BLAS_EXTRA_LIB_DIRS}; do
-                        for suffix in a so dylib; do
-                            file=${lib_dir}/lib${lib}.${suffix}
-                            if [ -r ${file} ]; then
-                                echo ${file}
-                                break 2
-                            fi
-                            unset file
-                        done
-                    done
-                    if [ -z "${file}" ]; then
-                        echo "PETSc:    Could not find BLAS library ${lib}" >&2
+                    unset file
+                done
+            done
+            if [ -z "${file}" ]; then
+                echo "PETSc:    Could not find MPI library ${lib}, trying system default" >&2
+                PETSC_EXTRA_LIBS="${PETSC_EXTRA_LIBS} -l${lib}"
+            fi
+        done
+        BLAS_LIB_LIST=""
+        for lib in ${BLAS_LIBS} ${PETSC_BLAS_EXTRA_LIBS}; do
+            for lib_dir in ${BLAS_LIB_DIRS} ${PETSC_BLAS_EXTRA_LIB_DIRS}; do
+                for suffix in a so dylib; do
+                    file=${lib_dir}/lib${lib}.${suffix}
+                    if [ -r ${file} ]; then
+                        BLAS_LIB_LIST="${BLAS_LIB_LIST} ${lib}"
+                        break 2
                     fi
-                done))
-        LAPACK_LIB_LIST=$(echo $(
-                for lib in ${LAPACK_LIBS} ${PETSC_LAPACK_EXTRA_LIBS}; do
-                    for lib_dir in ${LAPACK_LIB_DIRS} ${PETSC_LAPACK_EXTRA_LIB_DIRS}; do
-                        for suffix in a so dylib; do
-                            file=${lib_dir}/lib${lib}.${suffix}
-                            if [ -r ${file} ]; then
-                                echo ${file}
-                                break 2
-                            fi
-                            unset file
-                        done
-                    done
-                    if [ -z "${file}" ]; then
-                        echo "PETSc:    Could not find LAPACK library ${lib}" >&2
+                    unset file
+                done
+            done
+            if [ -z "${file}" ]; then
+                echo "PETSc:    Could not find BLAS library ${lib}, trying system default" >&2
+                PETSC_EXTRA_LIBS="${PETSC_EXTRA_LIBS} -l${lib}"
+            fi
+        done
+        LAPACK_LIB_LIST=""
+        for lib in ${LAPACK_LIBS} ${PETSC_LAPACK_EXTRA_LIBS}; do
+            for lib_dir in ${LAPACK_LIB_DIRS} ${PETSC_LAPACK_EXTRA_LIB_DIRS}; do
+                for suffix in a so dylib; do
+                    file=${lib_dir}/lib${lib}.${suffix}
+                    if [ -r ${file} ]; then
+                        LAPACK_LIB_LIST="${LAPACK_LIB_LIST} ${lib}"
+                        break 2
                     fi
-                done))
+                    unset file
+                done
+            done
+            if [ -z "${file}" ]; then
+                echo "PETSc:    Could not find LAPACK library ${lib}, trying system default" >&2
+                PETSC_EXTRA_LIBS="${PETSC_EXTRA_LIBS} -l${lib}"
+            fi
+        done
 #            --LDFLAGS="${LDFLAGS}"
 #            --with-shared=0
         ./config/configure.py                                                 \
+            --LIBS="${PETSC_EXTRA_LIBS}"                                      \
             --doCleanup=0                                                     \
             --prefix=${INSTALL_DIR}                                           \
             --with-cpp="${CPP}" --CPPFLAGS="${CPPFLAGS}"                      \
