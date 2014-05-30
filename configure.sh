@@ -161,79 +161,97 @@ then
         MPI_LIB_LIST=""
         PETSC_EXTRA_LIBS=""
         for lib in ${MPI_LIBS} ${PETSC_MPI_EXTRA_LIBS}; do
-            for lib_dir in ${MPI_LIB_DIRS} ${PETSC_MPI_EXTRA_LIB_DIRS}; do
-                for suffix in a so dylib; do
-                    file=${lib_dir}/lib${lib}.${suffix}
-                    if [ -r ${file} ]; then
-                        MPI_LIB_LIST="${MPI_LIB_LIST} ${file}"
-                        break 2
-                    fi
-                    unset file
+            # Don't add "-l" for options already starting with a hyphen
+            if ! echo "x${lib}" | grep -q '^x-'; then
+                for lib_dir in ${MPI_LIB_DIRS} ${PETSC_MPI_EXTRA_LIB_DIRS}; do
+                    for suffix in a so dylib; do
+                        file=${lib_dir}/lib${lib}.${suffix}
+                        if [ -r ${file} ]; then
+                            MPI_LIB_LIST="${MPI_LIB_LIST} ${file}"
+                            break 2
+                        fi
+                        unset file
+                    done
                 done
-            done
-            if [ -z "${file}" ]; then
-                echo "PETSc:    Could not find MPI library ${lib}, trying system default" >&2
-                PETSC_EXTRA_LIBS="${PETSC_EXTRA_LIBS} -l${lib}"
+                if [ -z "${file}" ]; then
+                    echo "PETSc:    Could not find MPI library ${lib}, trying system default" >&2
+                    PETSC_EXTRA_LIBS="${PETSC_EXTRA_LIBS} -l${lib}"
+                fi
             fi
         done
         BLAS_LIB_LIST=""
         for lib in ${BLAS_LIBS} ${PETSC_BLAS_EXTRA_LIBS}; do
-            for lib_dir in ${BLAS_LIB_DIRS} ${PETSC_BLAS_EXTRA_LIB_DIRS}; do
-                for suffix in a so dylib; do
-                    file=${lib_dir}/lib${lib}.${suffix}
-                    if [ -r ${file} ]; then
-                        BLAS_LIB_LIST="${BLAS_LIB_LIST} ${lib}"
-                        break 2
-                    fi
-                    unset file
+            # Don't add "-l" for options already starting with a hyphen
+            if ! echo "x${lib}" | grep -q '^x-'; then
+                for lib_dir in ${BLAS_LIB_DIRS} ${PETSC_BLAS_EXTRA_LIB_DIRS}; do
+                    for suffix in a so dylib; do
+                        file=${lib_dir}/lib${lib}.${suffix}
+                        if [ -r ${file} ]; then
+                            BLAS_LIB_LIST="${BLAS_LIB_LIST} ${lib}"
+                            break 2
+                        fi
+                        unset file
+                    done
                 done
-            done
-            if [ -z "${file}" ]; then
-                echo "PETSc:    Could not find BLAS library ${lib}, trying system default" >&2
-                PETSC_EXTRA_LIBS="${PETSC_EXTRA_LIBS} -l${lib}"
+                if [ -z "${file}" ]; then
+                    echo "PETSc:    Could not find BLAS library ${lib}, trying system default" >&2
+                    PETSC_EXTRA_LIBS="${PETSC_EXTRA_LIBS} -l${lib}"
+                fi
             fi
         done
         LAPACK_LIB_LIST=""
         for lib in ${LAPACK_LIBS} ${PETSC_LAPACK_EXTRA_LIBS}; do
-            for lib_dir in ${LAPACK_LIB_DIRS} ${PETSC_LAPACK_EXTRA_LIB_DIRS}; do
-                for suffix in a so dylib; do
-                    file=${lib_dir}/lib${lib}.${suffix}
-                    if [ -r ${file} ]; then
-                        LAPACK_LIB_LIST="${LAPACK_LIB_LIST} ${lib}"
-                        break 2
-                    fi
-                    unset file
+            # Don't add "-l" for options already starting with a hyphen
+            if ! echo "x${lib}" | grep -q '^x-'; then
+                for lib_dir in ${LAPACK_LIB_DIRS} ${PETSC_LAPACK_EXTRA_LIB_DIRS}; do
+                    for suffix in a so dylib; do
+                        file=${lib_dir}/lib${lib}.${suffix}
+                        if [ -r ${file} ]; then
+                            LAPACK_LIB_LIST="${LAPACK_LIB_LIST} ${lib}"
+                            break 2
+                        fi
+                        unset file
+                    done
                 done
-            done
-            if [ -z "${file}" ]; then
-                echo "PETSc:    Could not find LAPACK library ${lib}, trying system default" >&2
-                PETSC_EXTRA_LIBS="${PETSC_EXTRA_LIBS} -l${lib}"
+                if [ -z "${file}" ]; then
+                    echo "PETSc:    Could not find LAPACK library ${lib}, trying system default" >&2
+                    PETSC_EXTRA_LIBS="${PETSC_EXTRA_LIBS} -l${lib}"
+                fi
             fi
         done
-#            --LDFLAGS="${LDFLAGS}"
 #            --with-shared=0
-        ./config/configure.py                                                 \
-            --LIBS="${PETSC_EXTRA_LIBS}"                                      \
-            --doCleanup=0                                                     \
-            --prefix=${INSTALL_DIR}                                           \
-            --with-cpp="${CPP}" --CPPFLAGS="${CPPFLAGS}"                      \
-            --with-cc="${CC}" --CFLAGS="${CFLAGS}"                            \
-            --with-cxx="${CXX}" --CXXFLAGS="${CXXFLAGS}"                      \
-            --with-fc=0                                                       \
-            --with-ar="${AR}"                                                 \
-            --AR_FLAGS="${ARFLAGS}"                                           \
-            ${RANLIB:+--with-ranlib="${RANLIB}"}                              \
-            --with-mpi=yes                                                    \
-            ${MPI_INC_DIR:+--with-mpi-include="${MPI_INC_DIR}"}               \
-            ${MPI_LIB_LIST:+--with-mpi-lib=[$(echo ${MPI_LIB_LIST} |          \
-                    sed -e 's/ /,/g')]}                                       \
-            --with-mpi-compilers=no                                           \
-            --with-mpiexec=false                                              \
-            --with-x=no                                                       \
-            ${BLAS_LIB_LIST:+--with-blas-lib=[$(echo ${BLAS_LIB_LIST} |       \
-                    sed -e 's/ /,/g')]}                                       \
-            ${LAPACK_LIB_LIST:+--with-lapack-lib=[$(echo ${LAPACK_LIB_LIST} | \
-            sed -e 's/ /,/g')]}                                               \
+        PETSC_EXTRA_LDFLAGS=""
+        for dir in $LIBDIRS; do
+            PETSC_EXTRA_LDFLAGS="${PETSC_EXTRA_LDFLAGS} -L${dir} -Wl,-rpath,${dir}"
+        done
+        ./config/configure.py                                           \
+            --LDFLAGS="${LDFLAGS} ${PETSC_EXTRA_LDFLAGS}"               \
+            --LIBS="${PETSC_EXTRA_LIBS}"                                \
+            --doCleanup=0                                               \
+            --prefix=${INSTALL_DIR}                                     \
+            --with-cpp="${CPP}"                                         \
+            --CPPFLAGS="${CPPFLAGS}"                                    \
+            --with-cc="${CC}"                                           \
+            --CFLAGS="${CFLAGS} ${LDFLAGS} ${PETSC_EXTRA_LDFLAGS}"      \
+            --with-cxx="${CXX}"                                         \
+            --CXXFLAGS="${CXXFLAGS} ${LDFLAGS} ${PETSC_EXTRA_LDFLAGS}"  \
+            --with-fc=0                                                 \
+            --with-ar="${AR}" --AR_FLAGS="${ARFLAGS}"                   \
+            ${RANLIB:+--with-ranlib="${RANLIB}"}                        \
+            --with-mpi=yes                                              \
+            ${MPI_INC_DIR:+--with-mpi-include="${MPI_INC_DIR}"}         \
+            ${MPI_LIB_LIST:+                                            \
+                --with-mpi-lib=[$(echo ${MPI_LIB_LIST} |                \
+                    sed -e 's/ /,/g')]}                                 \
+            --with-mpi-compilers=no                                     \
+            --with-mpiexec=false                                        \
+            --with-x=no                                                 \
+            ${BLAS_LIB_LIST:+                                           \
+                --with-blas-lib=[$(echo ${BLAS_LIB_LIST} |              \
+                    sed -e 's/ /,/g')]}                                 \
+            ${LAPACK_LIB_LIST:+                                         \
+                --with-lapack-lib=[$(echo ${LAPACK_LIB_LIST} |          \
+                    sed -e 's/ /,/g')]}                                 \
             --with-make="${MAKE}"
         PETSC_ARCH=$(grep '^PETSC_ARCH=' conf/petscvariables | sed -e 's/^PETSC_ARCH=//')
         echo "PETSc: PETSC_ARCH is \"${PETSC_ARCH}\""
