@@ -62,7 +62,7 @@ then
     
     # Set locations
     THORN=PETSc
-    NAME=petsc-3.1-p8
+    NAME=petsc-3.5.2
     SRCDIR=$(dirname $0)
     BUILD_DIR=${SCRATCH_BUILD}/build/${THORN}
     if [ -z "${PETSC_INSTALL_DIR}" ]; then
@@ -123,6 +123,8 @@ then
         if echo '' ${ARFLAGS} | grep 64 > /dev/null 2>&1; then
             export OBJECT_MODE=64
         fi
+        # PETSc wants a serial make
+        MAKE="${MAKE} -j1"
         # Don't be confused by random existing variables
         unset HAVE_GSL
         unset GSL_DIR
@@ -219,6 +221,7 @@ then
                 fi
             fi
         done
+        LAPACK_LIB_LIST="${LAPACK_LIB_LIST} ${BLAS_LIB_LIST}"
 #            --with-shared=0
         PETSC_EXTRA_LDFLAGS=""
         for dir in $LIBDIRS; do
@@ -253,7 +256,8 @@ then
                 --with-lapack-lib=[$(echo ${LAPACK_LIB_LIST} |          \
                     sed -e 's/ /,/g')]}                                 \
             --with-make="${MAKE}"
-        PETSC_ARCH=$(grep '^PETSC_ARCH=' conf/petscvariables | sed -e 's/^PETSC_ARCH=//')
+        PETSC_ARCH=$(grep '^PETSC_ARCH=' conf/petscvariables |  \
+                     sed -e 's/^PETSC_ARCH=//')
         echo "PETSc: PETSC_ARCH is \"${PETSC_ARCH}\""
         echo "${PETSC_ARCH}" > PETSC_ARCH
         
