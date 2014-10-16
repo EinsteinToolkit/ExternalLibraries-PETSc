@@ -181,27 +181,7 @@ then
                 fi
             fi
         done
-        BLAS_LIB_LIST=""
-        for lib in ${BLAS_LIBS} ${PETSC_BLAS_EXTRA_LIBS}; do
-            # Don't add "-l" for options already starting with a hyphen
-            if ! echo "x${lib}" | grep -q '^x-'; then
-                for lib_dir in ${BLAS_LIB_DIRS} ${PETSC_BLAS_EXTRA_LIB_DIRS}; do
-                    for suffix in a so dylib; do
-                        file=${lib_dir}/lib${lib}.${suffix}
-                        if [ -r ${file} ]; then
-                            BLAS_LIB_LIST="${BLAS_LIB_LIST} ${lib}"
-                            break 2
-                        fi
-                        unset file
-                    done
-                done
-                if [ -z "${file}" ]; then
-                    echo "PETSc:    Could not find BLAS library ${lib}, trying system default" >&2
-                    PETSC_EXTRA_LIBS="${PETSC_EXTRA_LIBS} -l${lib}"
-                fi
-            fi
-        done
-        LAPACK_LIB_LIST=""
+        BLAS_LAPACK_LIB_LIST=""
         for lib in ${LAPACK_LIBS} ${PETSC_LAPACK_EXTRA_LIBS}; do
             # Don't add "-l" for options already starting with a hyphen
             if ! echo "x${lib}" | grep -q '^x-'; then
@@ -209,7 +189,7 @@ then
                     for suffix in a so dylib; do
                         file=${lib_dir}/lib${lib}.${suffix}
                         if [ -r ${file} ]; then
-                            LAPACK_LIB_LIST="${LAPACK_LIB_LIST} ${lib}"
+                            BLAS_LAPACK_LIB_LIST="${BLAS_LAPACK_LIB_LIST} ${lib}"
                             break 2
                         fi
                         unset file
@@ -221,10 +201,30 @@ then
                 fi
             fi
         done
-        LAPACK_LIB_LIST="${LAPACK_LIB_LIST} ${BLAS_LIB_LIST}"
+        for lib in ${BLAS_LIBS} ${PETSC_BLAS_EXTRA_LIBS}; do
+            # Don't add "-l" for options already starting with a hyphen
+            if ! echo "x${lib}" | grep -q '^x-'; then
+                for lib_dir in ${BLAS_LIB_DIRS} ${PETSC_BLAS_EXTRA_LIB_DIRS}; do
+                    for suffix in a so dylib; do
+                        file=${lib_dir}/lib${lib}.${suffix}
+                        if [ -r ${file} ]; then
+                            BLAS_LAPACK_LIB_LIST="${BLAS_LAPACK_LIB_LIST} ${lib}"
+                            break 2
+                        fi
+                        unset file
+                    done
+                done
+                if [ -z "${file}" ]; then
+                    echo "PETSc:    Could not find BLAS library ${lib}, trying system default" >&2
+                    PETSC_EXTRA_LIBS="${PETSC_EXTRA_LIBS} -l${lib}"
+                fi
+            fi
+        done
+        BLAS_LIB_LIST="${BLAS_LAPACK_LIB_LIST}"
+        LAPACK_LIB_LIST="${BLAS_LAPACK_LIB_LIST}"
 #            --with-shared=0
         PETSC_EXTRA_LDFLAGS=""
-        for dir in $LIBDIRS; do
+        for dir in $LAPACK_LIB_DIRS $PETSC_LAPACK_EXTRA_LIB_DIRS $BLAS_LIB_DIRS $PETSC_BLAS_EXTRA_LIB_DIRS $LIBDIRS; do
             PETSC_EXTRA_LDFLAGS="${PETSC_EXTRA_LDFLAGS} -L${dir} -Wl,-rpath,${dir}"
         done
         ./config/configure.py                                           \
