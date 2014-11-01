@@ -63,7 +63,7 @@ then
     # Set locations
     THORN=PETSc
     NAME=petsc-3.5.2
-    SRCDIR=$(dirname $0)
+    SRCDIR="$(dirname $0)"
     BUILD_DIR=${SCRATCH_BUILD}/build/${THORN}
     if [ -z "${PETSC_INSTALL_DIR}" ]; then
         INSTALL_DIR=${SCRATCH_BUILD}/external/${THORN}
@@ -115,7 +115,7 @@ then
         unset FFLAGS
         # PETSc's configuration variable has a different name, and
         # accepts only a single (sic!) directory
-        MPI_INC_DIR=$(echo $(for dir in ${MPI_INC_DIRS}; do echo ${dir}; done | head -n 1))
+        MPI_INC_DIR="$(echo $(for dir in ${MPI_INC_DIRS}; do echo ${dir}; done | head -n 1))"
         if [ "${USE_RANLIB}" != 'yes' ]; then
             unset RANLIB
         fi
@@ -371,9 +371,11 @@ echo 'BEGIN MAKE_DEPENDENCY'
 echo 'include $(BINDINGS_DIR)/Configuration/Capabilities/make.MPI.deps'
 echo 'END MAKE_DEPENDENCY'
 
+PETSC_INC_DIRS="$(${CCTK_HOME}/lib/sbin/strip-incdirs.sh ${PETSC_INC_DIRS})"
+PETSC_LIB_DIRS="$(${CCTK_HOME}/lib/sbin/strip-libdirs.sh ${PETSC_LIB_DIRS})"
+
 # Pass options to Cactus
 echo "BEGIN MAKE_DEFINITION"
-echo "HAVE_PETSC     = 1"
 echo "PETSC_DIR      = ${PETSC_DIR}"
 echo "PETSC_ARCH     = ${PETSC_ARCH}"
 echo "PETSC_INC_DIRS = ${PETSC_INC_DIRS}"
