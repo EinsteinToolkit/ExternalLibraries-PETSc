@@ -222,11 +222,12 @@ then
         done
         BLAS_LIB_LIST="${BLAS_LAPACK_LIB_LIST}"
         LAPACK_LIB_LIST="${BLAS_LAPACK_LIB_LIST}"
-#            --with-shared=0
         PETSC_EXTRA_LDFLAGS=""
         for dir in $LAPACK_LIB_DIRS $PETSC_LAPACK_EXTRA_LIB_DIRS $BLAS_LIB_DIRS $PETSC_BLAS_EXTRA_LIB_DIRS $LIBDIRS; do
             PETSC_EXTRA_LDFLAGS="${PETSC_EXTRA_LDFLAGS} -L${dir} -Wl,-rpath,${dir}"
         done
+        # --with-shared=0
+        # --with-64-bit-indices
         ./config/configure.py                                           \
             --LDFLAGS="${LDFLAGS} ${PETSC_EXTRA_LDFLAGS}"               \
             --LIBS="${PETSC_EXTRA_LIBS}"                                \
