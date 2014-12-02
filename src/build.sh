@@ -182,6 +182,7 @@ done
         --with-mpi-lib=[$(echo ${MPI_LIB_LIST} | sed -e 's/ /,/g')]}       \
     --with-mpi-compilers=no                                                \
     --with-mpiexec=false                                                   \
+    --with-ssl=no                                                          \
     --with-x=no                                                            \
     ${BLAS_LIB_LIST:+                                                      \
         --with-blas-lib=[$(echo ${BLAS_LIB_LIST} | sed -e 's/ /,/g')]}     \
