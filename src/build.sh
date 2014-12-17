@@ -157,7 +157,7 @@ BLAS_LIB_LIST="${BLAS_LAPACK_LIB_LIST}"
 LAPACK_LIB_LIST="${BLAS_LAPACK_LIB_LIST}"
 PETSC_EXTRA_LDFLAGS=""
 for dir in $LAPACK_LIB_DIRS $PETSC_LAPACK_EXTRA_LIB_DIRS $BLAS_LIB_DIRS $PETSC_BLAS_EXTRA_LIB_DIRS $LIBDIRS; do
-    PETSC_EXTRA_LDFLAGS="${PETSC_EXTRA_LDFLAGS} -L${dir} -Wl,-rpath,${dir}"
+    PETSC_EXTRA_LDFLAGS="${PETSC_EXTRA_LDFLAGS} ${LIBDIR_PREFIX}${dir} ${RUNDIR_PREFIX}${dir}"
 done
 # Using --with-shared-libraries=0 to avoid using other, static
 # libraries into PETSc's shared library, which doesn't work in general
