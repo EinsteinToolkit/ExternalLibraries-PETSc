@@ -154,6 +154,7 @@ fi
 
 # Pass configuration options to build script
 echo "BEGIN MAKE_DEFINITION"
+echo "PETSC_INT8                  = ${PETSC_INT8}"
 echo "PETSC_BLAS_EXTRA_LIB_DIRS   = ${PETSC_BLAS_EXTRA_LIB_DIRS}"
 echo "PETSC_BLAS_EXTRA_LIBS       = ${PETSC_BLAS_EXTRA_LIBS}"
 echo "PETSC_LAPACK_EXTRA_LIB_DIRS = ${PETSC_LAPACK_EXTRA_LIB_DIRS}"

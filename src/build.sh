@@ -47,7 +47,7 @@ unset FC
 unset FFLAGS
 # PETSc's configuration variable has a different name, and accepts
 # only a single (sic!) directory
-MPI_INC_DIR="$(echo $(for dir in ${MPI_INC_DIRS}; do echo ${dir}; done | head -n 1))"
+MPI_INC_DIR="$(echo $(for dir in ${PETSC_MPI_EXTRA_INC_DIRS} ${MPI_INC_DIRS}; do echo ${dir}; done | head -n 1))"
 if [ "${USE_RANLIB}" != 'yes' ]; then
     unset RANLIB
 fi
@@ -153,22 +153,34 @@ for lib in ${BLAS_LIBS} ${PETSC_BLAS_EXTRA_LIBS}; do
         fi
     fi
 done
+PETSC_EXTRA_CPPFLAGS=""
+for dir in $LAPACK_INC_DIRS $PETSC_LAPACK_EXTRA_INC_DIRS $BLAS_INC_DIRS $PETSC_BLAS_EXTRA_INC_DIRS $SYS_INC_DIRS; do
+    if echo " $dir" | grep -q -e '^ -'; then
+        PETSC_EXTRA_CPPFLAGS="${PETSC_EXTRA_CPPFLAGS} $dir"
+    fi
+done
 BLAS_LIB_LIST="${BLAS_LAPACK_LIB_LIST}"
 LAPACK_LIB_LIST="${BLAS_LAPACK_LIB_LIST}"
 PETSC_EXTRA_LDFLAGS=""
 for dir in $LAPACK_LIB_DIRS $PETSC_LAPACK_EXTRA_LIB_DIRS $BLAS_LIB_DIRS $PETSC_BLAS_EXTRA_LIB_DIRS $LIBDIRS; do
     PETSC_EXTRA_LDFLAGS="${PETSC_EXTRA_LDFLAGS} ${LIBDIR_PREFIX}${dir} ${RUNDIR_PREFIX}${dir}"
 done
+if [ "${CCTK_BLAS_INT8}" != 0 ]; then
+    known_64_bit_blas_indices='--known-64-bit-blas-indices=yes'
+fi
+if [ -n "${PETSC_INT8}" -a "${PETSC_INT8}" != 0 ]; then
+    with_64_bit_indices='--with-64-bit-indices=yes'
+fi
+PETSC_INT8=''
 # Using --with-shared-libraries=0 to avoid using other, static
 # libraries into PETSc's shared library, which doesn't work in general
-# --with-64-bit-indices
 ./config/configure.py                                                      \
     --LDFLAGS="${LDFLAGS} ${PETSC_EXTRA_LDFLAGS}"                          \
     --LIBS="${PETSC_EXTRA_LIBS}"                                           \
     --doCleanup=0                                                          \
     --prefix=${INSTALL_DIR}                                                \
     --with-cpp="${CPP}"                                                    \
-    --CPPFLAGS="${CPPFLAGS}"                                               \
+    --CPPFLAGS="${CPPFLAGS} ${PETSC_EXTRA_CPPFLAGS}"                       \
     --with-cc="${CC}"                                                      \
     --CFLAGS="${CFLAGS} ${LDFLAGS} ${PETSC_EXTRA_LDFLAGS}"                 \
     --with-cxx="${CXX}"                                                    \
@@ -183,12 +195,14 @@ done
         --with-mpi-lib=[$(echo ${MPI_LIB_LIST} | sed -e 's/ /,/g')]}       \
     --with-mpi-compilers=no                                                \
     --with-mpiexec=false                                                   \
+    ${with_64_bit_indices}                                                 \
     --with-ssl=no                                                          \
     --with-x=no                                                            \
     ${BLAS_LIB_LIST:+                                                      \
         --with-blas-lib=[$(echo ${BLAS_LIB_LIST} | sed -e 's/ /,/g')]}     \
     ${LAPACK_LIB_LIST:+                                                    \
         --with-lapack-lib=[$(echo ${LAPACK_LIB_LIST} | sed -e 's/ /,/g')]} \
+    ${known_64_bit_blas_indices}                                           \
     --with-make="${MAKE}"
 PETSC_ARCH=$(grep '^PETSC_ARCH=' conf/petscvariables |  \
     sed -e 's/^PETSC_ARCH=//')
