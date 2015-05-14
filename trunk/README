@@ -1,0 +1,57 @@
+Cactus Code Thorn PETSc
+Author(s)    : Erik Schnetter
+Maintainer(s): Cactus team
+Licence      : ?
+--------------------------------------------------------------------------
+
+1. Purpose
+
+Distribute the PETSc library; see <http://www.mcs.anl.gov/petsc>.
+
+
+
+From the web site:
+
+Portable, Extensible Toolkit for Scientific Computation
+
+PETSc, pronounced PET-see (the S is silent), is a suite of data
+structures and routines for the scalable (parallel) solution of
+scientific applications modeled by partial differential equations. It
+employs the MPI standard for parallelism.
+
+
+
+When referencing PETSc in a publication, please cite the following:
+
+@Misc{petsc-web-page,
+  Author =       "Satish Balay and Kris Buschelman and William D.
+                  Gropp and Dinesh Kaushik and Matthew G. Knepley and
+                  Lois Curfman McInnes and Barry F. Smith and Hong
+                  Zhang",
+  Title =        "{PETSc} {W}eb page",
+  Note =         "http://www.mcs.anl.gov/petsc",
+  Year =         2009
+}
+
+@TechReport{petsc-user-ref,
+  Author =       "Satish Balay and Kris Buschelman and Victor Eijkhout
+                  and William D. Gropp and Dinesh Kaushik and Matthew
+                  G. Knepley and Lois Curfman McInnes and Barry F.
+                  Smith and Hong Zhang",
+  Title =        "{PETS}c Users Manual",
+  Number =       "ANL-95/11 - Revision 3.0.0",
+  Institution =  "Argonne National Laboratory",
+  Year =         2008
+}
+
+@InProceedings{petsc-efficient,
+  Author =       "Satish Balay and William D. Gropp and Lois Curfman
+                  McInnes and Barry F. Smith",
+  Title =        "Efficient Management of Parallelism in Object
+                  Oriented Numerical Software Libraries",
+  Booktitle =    "Modern Software Tools in Scientific Computing",
+  Editor =       "E. Arge and A. M. Bruaset and H. P. Langtangen",
+  Pages =        "163--202",
+  Publisher =    "Birkh{\"{a}}user Press",
+  Year =         1997
+}
