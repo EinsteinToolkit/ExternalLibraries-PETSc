@@ -75,8 +75,10 @@ then
 else
     THORN=PETSc
     DONE_FILE=${SCRATCH_BUILD}/done/${THORN}
-    mkdir ${SCRATCH_BUILD}/done 2> /dev/null || true
-    date > ${DONE_FILE}
+    if [ ! -e ${DONE_FILE} ]; then
+        mkdir ${SCRATCH_BUILD}/done 2> /dev/null || true
+        date > ${DONE_FILE}
+    fi
 fi
 
 
@@ -85,12 +87,12 @@ fi
 # Set options
 ################################################################################
 
-if [ -n "${THORN}" ]; then
+if [ -n "${INSTALL_DIR}" ]; then
     
     # We built PETSc ourselves, and know what is going on
-    PETSC_INC_DIRS="${PETSC_DIR}/include ${PETSC_MPI_INC_DIR}"
-    PETSC_LIB_DIRS="${PETSC_DIR}/lib ${PETSC_MPI_LIB_DIRS}"
-    PETSC_LIBS="petsc ${PETSC_MPI_LIBS}"
+    PETSC_INC_DIRS="${PETSC_DIR}/include"
+    PETSC_LIB_DIRS="${PETSC_DIR}/lib"
+    PETSC_LIBS="petsc"
     
 else
     
@@ -168,6 +170,10 @@ PETSC_INC_DIRS="$(${CCTK_HOME}/lib/sbin/strip-incdirs.sh ${PETSC_INC_DIRS})"
 PETSC_LIB_DIRS="$(${CCTK_HOME}/lib/sbin/strip-libdirs.sh ${PETSC_LIB_DIRS})"
 
 # Pass options to Cactus
+echo "BEGIN DEFINE"
+echo "PETSC_SKIP_COMPLEX 1   /* Don't include <complex.h> */"
+echo "END DEFINE"
+
 echo "BEGIN MAKE_DEFINITION"
 echo "PETSC_DIR      = ${PETSC_DIR}"
 echo "PETSC_ARCH     = ${PETSC_ARCH}"
