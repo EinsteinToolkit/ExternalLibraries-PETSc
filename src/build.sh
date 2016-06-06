@@ -45,6 +45,7 @@ unset PETSC_DIR
 #fi
 unset FC
 unset FFLAGS
+unset ARFLAGS
 # PETSc's configuration variable has a different name, and accepts
 # only a single (sic!) directory
 MPI_INC_DIR="$(echo $(for dir in ${PETSC_MPI_EXTRA_INC_DIRS} ${MPI_INC_DIRS}; do echo ${dir}; done | head -n 1))"
