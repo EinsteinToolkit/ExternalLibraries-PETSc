@@ -55,7 +55,7 @@ unset LIBS
 if echo '' ${ARFLAGS} | grep 64 > /dev/null 2>&1; then
     export OBJECT_MODE=64
 fi
-unset ARFLAGS
+ARFLAGS=`echo ${ARFLAGS} | tr -d u`
 # PETSc wants a serial make
 MAKE="${MAKE} -j1"
 # Don't be confused by random existing variables
