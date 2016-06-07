@@ -47,6 +47,8 @@ if [ -z "${PETSC_DIR}" ]; then
     fi
 fi
 
+THORN=PETSc
+
 
 
 ################################################################################
@@ -61,7 +63,6 @@ then
     echo "END MESSAGE"
     
     # Set locations
-    THORN=PETSc
     BUILD_DIR=${SCRATCH_BUILD}/build/${THORN}
     if [ -z "${PETSC_INSTALL_DIR}" ]; then
         INSTALL_DIR=${SCRATCH_BUILD}/external/${THORN}
@@ -71,9 +72,10 @@ then
         echo "END MESSAGE"
         INSTALL_DIR=${PETSC_INSTALL_DIR}
     fi
+    PETSC_BUILD=1
     PETSC_DIR=${INSTALL_DIR}
 else
-    THORN=PETSc
+    PETSC_BUILD=
     DONE_FILE=${SCRATCH_BUILD}/done/${THORN}
     if [ ! -e ${DONE_FILE} ]; then
         mkdir ${SCRATCH_BUILD}/done 2> /dev/null || true
@@ -156,6 +158,7 @@ fi
 
 # Pass configuration options to build script
 echo "BEGIN MAKE_DEFINITION"
+echo "PETSC_BUILD                 = ${PETSC_BUILD}"
 echo "PETSC_INT8                  = ${PETSC_INT8}"
 echo "PETSC_BLAS_EXTRA_LIB_DIRS   = ${PETSC_BLAS_EXTRA_LIB_DIRS}"
 echo "PETSC_BLAS_EXTRA_LIBS       = ${PETSC_BLAS_EXTRA_LIBS}"
