@@ -46,8 +46,13 @@ unset PETSC_DIR
 unset FC
 unset FFLAGS
 # PETSc's configuration variable has a different name, and accepts
-# only a single (sic!) directory
-MPI_INC_DIR="$(echo $(for dir in ${PETSC_MPI_EXTRA_INC_DIRS} ${MPI_INC_DIRS}; do echo ${dir}; done | head -n 1))"
+# only a single (sic!) directory so we try and pick the one that contains mpi.h
+for dir in ${PETSC_MPI_EXTRA_INC_DIRS} ${MPI_INC_DIRS}; do
+    if [ -r "$dir/mpi.h" ]; then
+        MPI_INC_DIR="$dir"
+        break
+    fi
+done
 if [ "${USE_RANLIB}" != 'yes' ]; then
     unset RANLIB
 fi
