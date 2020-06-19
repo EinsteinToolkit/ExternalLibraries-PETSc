@@ -14,7 +14,7 @@ set -e                          # Abort on errors
 
 # Set locations
 THORN=PETSc
-NAME=petsc-3.5.2
+NAME=petsc-3.12.5
 SRCDIR="$(dirname $0)"
 BUILD_DIR=${SCRATCH_BUILD}/build/${THORN}
 if [ -z "${PETSC_INSTALL_DIR}" ]; then
@@ -210,7 +210,7 @@ PETSC_INT8=''
         --with-lapack-lib=[$(echo ${LAPACK_LIB_LIST} | sed -e 's/ /,/g')]} \
     ${known_64_bit_blas_indices}                                           \
     --with-make="${MAKE}"
-PETSC_ARCH=$(grep '^PETSC_ARCH=' conf/petscvariables |  \
+PETSC_ARCH=$(grep '^PETSC_ARCH=' lib/petsc/conf/petscvariables |  \
     sed -e 's/^PETSC_ARCH=//')
 echo "PETSc: PETSC_ARCH is \"${PETSC_ARCH}\""
 echo "${PETSC_ARCH}" > PETSC_ARCH
