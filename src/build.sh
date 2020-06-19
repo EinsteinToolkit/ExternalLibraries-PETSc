@@ -14,7 +14,7 @@ set -e                          # Abort on errors
 
 # Set locations
 THORN=PETSc
-NAME=petsc-3.12.5
+NAME=petsc-3.21.5
 SRCDIR="$(dirname $0)"
 BUILD_DIR=${SCRATCH_BUILD}/build/${THORN}
 if [ -z "${PETSC_INSTALL_DIR}" ]; then
