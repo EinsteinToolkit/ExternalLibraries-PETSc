@@ -84,6 +84,15 @@ unset LIBJPEG_DIR
 unset LIBJPEG_INC_DIRS
 unset LIBJPEG_LIB_DIRS
 unset LIBJPEG_LIBS
+# configure complains about these but we use them so cannot just unset them
+export -n F77
+export -n F90
+export -n F90FLAGS
+export -n CPP
+export -n MPI_DIR
+export -n MAKEFLAGS
+export -n AR
+
 echo "PETSc: Current environment settings:"
 env | sort
 
@@ -209,7 +218,7 @@ PETSC_INT8=''
     ${LAPACK_LIB_LIST:+                                                    \
         --with-lapack-lib=[$(echo ${LAPACK_LIB_LIST} | sed -e 's/ /,/g')]} \
     ${known_64_bit_blas_indices}                                           \
-    --with-make="${MAKE}"
+    MAKE="${MAKE}"
 PETSC_ARCH=$(grep '^PETSC_ARCH=' lib/petsc/conf/petscvariables |  \
     sed -e 's/^PETSC_ARCH=//')
 echo "PETSc: PETSC_ARCH is \"${PETSC_ARCH}\""
