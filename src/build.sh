@@ -186,10 +186,16 @@ fi
 if [ -n "${PETSC_INT8}" -a "${PETSC_INT8}" != 0 ]; then
     with_64_bit_indices='--with-64-bit-indices=yes'
 fi
+if [ "${CCTK_DEBUG_MODE}" = yes ]; then
+    with_debugging='--with-debugging=1'
+else
+    with_debugging='--with-debugging=0'
+fi
 PETSC_INT8=''
 # Using --with-shared-libraries=0 to avoid using other, static
 # libraries into PETSc's shared library, which doesn't work in general
 ./config/configure.py                                                      \
+    ${with_debugging}                                                      \
     --LDFLAGS="${LDFLAGS} ${PETSC_EXTRA_LDFLAGS}"                          \
     --LIBS="${PETSC_EXTRA_LIBS}"                                           \
     --doCleanup=0                                                          \
