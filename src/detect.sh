@@ -89,6 +89,13 @@ fi
 # Set options
 ################################################################################
 
+# PETSc's configure.py script wants to test-compile and needs the extra
+# libraries specified by the user, howerver Cactus does not provide them during
+# the build stage, since it extends them by teh ExternalLibraries generated
+# ones
+PETSC_CCTK_LIBS="$LIBS"
+PETSC_CCTK_LIBDIRS="$LIBDIRS"
+
 if [ -n "${INSTALL_DIR}" ]; then
     
     # We built PETSc ourselves, and know what is going on
@@ -167,6 +174,8 @@ echo "PETSC_LAPACK_EXTRA_LIBS     = ${PETSC_LAPACK_EXTRA_LIBS}"
 echo "PETSC_MPI_EXTRA_LIB_DIRS    = ${PETSC_MPI_EXTRA_LIB_DIRS}"
 echo "PETSC_MPI_EXTRA_LIBS        = ${PETSC_MPI_EXTRA_LIBS}"
 echo "PETSC_INSTALL_DIR           = ${PETSC_INSTALL_DIR}"
+echo "PETSC_CCTK_LIBDIRS          = ${PETSC_CCTK_LIBDIRS}"
+echo "PETSC_CCTK_LIBS             = ${PETSC_CCTK_LIBS}"
 echo "END MAKE_DEFINITION"
 
 PETSC_INC_DIRS="$(${CCTK_HOME}/lib/sbin/strip-incdirs.sh ${PETSC_INC_DIRS})"

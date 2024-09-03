@@ -168,6 +168,25 @@ for lib in ${BLAS_LIBS} ${PETSC_BLAS_EXTRA_LIBS}; do
         fi
     fi
 done
+for lib in ${PETSC_CCTK_LIBS}; do
+    # Don't add "-l" for options already starting with a hyphen
+    if ! echo "x${lib}" | grep -q '^x-'; then
+        for lib_dir in ${PETSC_CCTK_LIBDIRS}; do
+            for suffix in a so dylib; do
+                file=${lib_dir}/lib${lib}.${suffix}
+                if [ -r ${file} ]; then
+                    PETSC_EXTRA_LIBS="${PETSC_EXTRA_LIBS} -l${lib}"
+                    break 2
+                fi
+                unset file
+            done
+        done
+        if [ -z "${file}" ]; then
+            echo "PETSc:    Could not find library ${lib}, trying system default" >&2
+            PETSC_EXTRA_LIBS="${PETSC_EXTRA_LIBS} -l${lib}"
+        fi
+    fi
+done
 PETSC_EXTRA_CPPFLAGS=""
 for dir in $LAPACK_INC_DIRS $PETSC_LAPACK_EXTRA_INC_DIRS $BLAS_INC_DIRS $PETSC_BLAS_EXTRA_INC_DIRS $SYS_INC_DIRS; do
     if echo " $dir" | grep -q -e '^ -'; then
@@ -177,7 +196,7 @@ done
 BLAS_LIB_LIST="${BLAS_LAPACK_LIB_LIST}"
 LAPACK_LIB_LIST="${BLAS_LAPACK_LIB_LIST}"
 PETSC_EXTRA_LDFLAGS=""
-for dir in $LAPACK_LIB_DIRS $PETSC_LAPACK_EXTRA_LIB_DIRS $BLAS_LIB_DIRS $PETSC_BLAS_EXTRA_LIB_DIRS $LIBDIRS; do
+for dir in $LAPACK_LIB_DIRS $PETSC_LAPACK_EXTRA_LIB_DIRS $BLAS_LIB_DIRS $PETSC_BLAS_EXTRA_LIB_DIRS $PETSC_CCTK_LIBDIRS; do
     PETSC_EXTRA_LDFLAGS="${PETSC_EXTRA_LDFLAGS} ${LIBDIR_PREFIX}${dir} ${RUNDIR_PREFIX}${dir}"
 done
 if [ "${CCTK_BLAS_INT8}" != 0 ]; then
