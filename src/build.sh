@@ -110,10 +110,15 @@ echo "PETSc: Configuring..."
 cd ${NAME}
 MPI_LIB_LIST=""
 PETSC_EXTRA_LIBS=""
-for lib in ${MPI_LIBS} ${PETSC_MPI_EXTRA_LIBS}; do
+# When MPI is built from source against the hwloc thorn, OpenMPI's static
+# libraries have undefined references into libhwloc (e.g.
+# hwloc_topology_get_support in libopen-pal.a). hwloc is not part of
+# MPI_LIBS, so it must be appended to the MPI library list for PETSc's
+# configure-time MPI link check to succeed.
+for lib in ${MPI_LIBS} ${PETSC_MPI_EXTRA_LIBS} ${HWLOC_LIBS}; do
     # Don't add "-l" for options already starting with a hyphen
     if ! echo "x${lib}" | grep -q '^x-'; then
-        for lib_dir in ${MPI_LIB_DIRS} ${PETSC_MPI_EXTRA_LIB_DIRS}; do
+        for lib_dir in ${MPI_LIB_DIRS} ${PETSC_MPI_EXTRA_LIB_DIRS} ${HWLOC_LIB_DIRS}; do
             for suffix in a so dylib; do
                 file=${lib_dir}/lib${lib}.${suffix}
                 if [ -r ${file} ]; then
